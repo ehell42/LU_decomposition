@@ -1,7 +1,8 @@
 #include <iostream>
 #include <fstream>
 
-const int n = 5;
+const int n = 5;	//размерность матрицы
+//const int b = 5;	//размерность блока
 
 void	make_matrix(double* &A);
 void	init_matrix(double*& A);
@@ -9,6 +10,7 @@ void	init_zero(double*& A);
 void	LU_decomposition(double*& A, double*& L, double*& U);
 void	LU_decomposition(double*& A);
 void	LU_decomposition_blocks(double*& A);
+void	LU_solve(double* L, double* U, double* b, double*& x);
 void	print_matrix(double* A);
 void	mult(double* &C, double *L, double *U);
 void	clear_matrix(double* &A);
@@ -19,6 +21,11 @@ int	main()
 	double* L = NULL;
 	double* U = NULL;
 	double* C = NULL;
+	double* b = NULL;
+	double* x = NULL;
+
+	b = new double[n];
+	x = new double[n];
 
 	make_matrix(A);
 	make_matrix(L);
@@ -32,7 +39,7 @@ int	main()
 	print_matrix(A);
 
 	//алгоритм из вики
-/*	LU_decomposition(A, L, U);
+	LU_decomposition(A, L, U);
 	std::cout << "\nU-matrix algorithm with new matrix\n";
 	print_matrix(U);
 	std::cout << "\nL-matrix algorithm with new matrix\n";
@@ -41,13 +48,18 @@ int	main()
 	mult(C, L, U);
 	print_matrix(C);*/
 	
+	//решатель с помощью LU
+	for (int i = 0; i < n; i++) b[i] = 1;
+	LU_solve(L, U, b, x);
+	for (int i = 0; i < n; i++) std::cout << x[i] << '\t';
+
 	//алгоритм из Демеля
-	std::cout << "\nNew A-matrix algorithm with L and U instead A\n";
+/*	std::cout << "\nNew A-matrix algorithm with L and U instead A\n";
 	LU_decomposition(A);
-	print_matrix(A);
+	print_matrix(A);*/
 
 	//блочное LU разложение
-	std::cout << "\nLU-decomposition using blocks\n";
+/*	std::cout << "\nLU-decomposition using blocks\n";*/
 
 	//очистка памяти
 	clear_matrix(A);
@@ -120,6 +132,32 @@ void	LU_decomposition(double*& A)
 void	LU_decomposition_blocks(double*& A)
 {
 
+}
+//solver
+void	LU_solve(double* L, double* U, double* b, double* &x)
+{
+	double* y = new double[n];
+
+	//прямой ход Гаусса для нахождения y (Ly=b)
+	y[0] = b[0];
+	for (int i = 1; i < n; i++)
+	{
+		y[i] = b[i];
+		for (int k = 0; k < i; k++)
+			y[i] -= y[k] * L[i * n + k];
+	}
+//	for (int i = 0; i < n; i++)
+//		std::cout << y[i] << std::endl;
+
+	//обратный ход Гаусса для нахождения x (Ux = y)
+	x[n - 1] = y[n - 1];
+	for (int i = n - 2; i > 0; i--)
+	{
+		x[i] = y[i];
+		for (int k = i + 1; k < n; k++)
+			x[i] -= x[k] * U[i * n + k];
+	}
+	delete[] y;
 }
 
 void	print_matrix(double* A)
