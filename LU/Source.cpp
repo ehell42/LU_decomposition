@@ -49,9 +49,10 @@ int	main()
 	print_matrix(C);*/
 	
 	//решатель с помощью LU
-	for (int i = 0; i < n; i++) b[i] = 1;
+/*	for (int i = 0; i < n; i++) b[i] = 1;
 	LU_solve(L, U, b, x);
-	for (int i = 0; i < n; i++) std::cout << x[i] << '\t';
+	std::cout << '\n';
+	for (int i = 0; i < n; i++) std::cout << x[i] << '\t';*/
 
 	//алгоритм из Демеля
 /*	std::cout << "\nNew A-matrix algorithm with L and U instead A\n";
@@ -133,27 +134,24 @@ void	LU_decomposition_blocks(double*& A)
 {
 
 }
-//solver
+//solver works
 void	LU_solve(double* L, double* U, double* b, double* &x)
 {
 	double* y = new double[n];
 
 	//прямой ход Гаусса для нахождения y (Ly=b)
-	y[0] = b[0];
+	y[0] = b[0] / L[0];
 	for (int i = 1; i < n; i++)
 	{
-		y[i] = b[i];
+		y[i] = b[i] / L[i * n + i];
 		for (int k = 0; k < i; k++)
 			y[i] -= y[k] * L[i * n + k];
 	}
-//	for (int i = 0; i < n; i++)
-//		std::cout << y[i] << std::endl;
-
 	//обратный ход Гаусса для нахождения x (Ux = y)
-	x[n - 1] = y[n - 1];
-	for (int i = n - 2; i > 0; i--)
+	x[n - 1] = y[n - 1] / U[(n - 1) * n + (n - 1)];
+	for (int i = n - 2; i >= 0; i--)
 	{
-		x[i] = y[i];
+		x[i] = y[i] / U[i * n + i];
 		for (int k = i + 1; k < n; k++)
 			x[i] -= x[k] * U[i * n + k];
 	}
