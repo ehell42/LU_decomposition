@@ -113,7 +113,7 @@ void	copy_part_matrix(double* A, double*& B, int d, int f)
 	{
 		for (int i = d; i < n; i++)
 			for (int j = d - b; j < d; j++)
-				B[(i - d) * (n - d) + (j - (d - b))] = A[i * n + j];
+				B[(i - d) * b + (j - (d - b))] = A[i * n + j];
 	}
 	else
 	{
@@ -167,7 +167,7 @@ void	LU_decomposition(double*& A, int m)
 				A[j * m + k] = A[j * m + k] - A[j * m + i] * A[i * m + k];
 	}
 }
-//blocks LU-decomposition from Demmel (works)
+//blocks LU-decomposition from Demmel (works with 5)
 void	LU_decomposition_blocks(double*& A)
 {
 	double* A12_tmp = new double[(n - b) * b];
@@ -208,16 +208,16 @@ void	LU_decomposition_blocks(double*& A)
 				for (int k = 0; k < b; k++)
 					A[j * n + l] -= A21_tmp[(j - (i + b)) * b + k] * A12_tmp[k * (n - (b + i)) + (l - (i + b))];
 		//copy matrix A11 in A (works)
-		for (int j = i; j < b + i; j++)
-			for (int l = i; l < b + i; l++)
+		for (int j = i; j < i + b; j++)
+			for (int l = i; l < i + b; l++)
 				A[j * n + l] = A11_tmp[(j - i) * b + l - i];
 		//copy matrix A12 in A (works)
-		for (int j = i; j < b; j++)
+		for (int j = i; j < b + i; j++)
 			for (int l = i + b; l < n; l++)
 				A[j * n + l] = A12_tmp[(j - i) * (n - (i + b)) + l - (i + b)];
 		//copy matrix A21 in A (works)
 		for (int j = i + b; j < n; j++)
-			for (int l = i; l < b; l++)
+			for (int l = i; l < i + b; l++)
 				A[j * n + l] = A21_tmp[(j - (i + b)) * b + l - i];
 	}
 }
