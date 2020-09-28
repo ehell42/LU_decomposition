@@ -1,27 +1,5 @@
 #include "LU.h"
 
-//works right
-void	copy_part_matrix(double* A, double*& B, int d, int f)
-{
-	if (f == 0)
-	{
-		for (int i = d - b; i < d; i++)
-			for (int j = d; j < n; j++)
-				B[(i - (d - b)) * (n - d) + (j - d)] = A[i * n + j];
-	}
-	else if (f == 1)
-	{
-		for (int i = d; i < n; i++)
-			for (int j = d - b; j < d; j++)
-				B[(i - d) * b + (j - (d - b))] = A[i * n + j];
-	}
-	else
-	{
-		for (int i = d; i < d + b; i++)
-			for (int j = d; j < d + b; j++)
-				B[(i - d) * b + (j - d)] = A[i * n + j];
-	}
-}
 //from wiki (works)
 void	LU_decomposition(double*& A, double*& L, double*& U)
 {
@@ -80,11 +58,11 @@ void	LU_decomposition_blocks(double*& A)
 	for (int i = 0; i < n; i += b)
 	{
 		//find diagonal block (works)
-		copy_part_matrix(A, A11_tmp, i, 2);//right
+		copy_part_matrix(A, A11_tmp, i, 2, b);//right
 		LU_decomposition(A11_tmp, b);//right
 		//copy side matrix
-		copy_part_matrix(A, A12_tmp, i + b, 0);//right
-		copy_part_matrix(A, A21_tmp, i + b, 1);//right
+		copy_part_matrix(A, A12_tmp, i + b, 0, b);//right
+		copy_part_matrix(A, A21_tmp, i + b, 1, b);//right
 		//find U_12 (works)
 		for (int j = 0; j < n - (i + b); j++)
 			for (int k = 1; k < b; k++)
@@ -123,6 +101,64 @@ void	LU_decomposition_blocks(double*& A)
 	clear_matrix(A21_tmp);
 	clear_matrix(A12_tmp);
 }
+//blocks LU-decomposition from Demmel with transpose U
+void	LU_transpose_decomposition_blocks(double*& A)
+{
+	double* A12_tmp = new double[(n - b) * b];
+	double* A21_tmp = new double[(n - b) * b];
+	double* A11_tmp = new double[b * b];
+
+	init_zero(A12_tmp, (n - b) * b);
+	init_zero(A21_tmp, (n - b) * b);
+	init_zero(A11_tmp, b * b);
+
+	for (int i = 0; i < n; i += b)
+	{
+		//find diagonal block (works)
+		copy_part_matrix(A, A11_tmp, i, 2, b);//right
+		LU_decomposition(A11_tmp, b);//right
+		//copy side matrix
+		copy_part_matrix(A, A12_tmp, i + b, 3, b);//right
+		copy_part_matrix(A, A21_tmp, i + b, 1, b);//right
+		//find U_12 (works)
+		for (int j = 0; j < n - (i + b); j++)
+			for (int k = 1; k < b; k++)
+				for (int l = 0; l < k; l++)
+					A12_tmp[j * b + k] -= A12_tmp[j * b + l] * A11_tmp[k * b + l];
+		//find L_21 (works)
+		for (int j = 0; j < n - (i + b); j++)
+		{
+			A21_tmp[j * b] /= A11_tmp[0];
+			for (int k = 1; k < b; k++)
+			{
+				for (int l = 0; l < k; l++)
+					A21_tmp[j * b + k] -= A21_tmp[j * b + l] * A11_tmp[l * b + k];
+				A21_tmp[j * b + k] /= A11_tmp[k * b + k];
+			}
+		}
+		//change matrix A22 (works)
+		for (int j = i + b; j < n; j++)
+			for (int l = i + b; l < n; l++)
+				for (int k = 0; k < b; k++)
+					A[j * n + l] -= A21_tmp[(j - (i + b)) * b + k] * A12_tmp[(l - (i + b)) * b + k];
+		//copy matrix A11 in A (works)
+		for (int j = i; j < i + b; j++)
+			for (int l = i; l < i + b; l++)
+				A[j * n + l] = A11_tmp[(j - i) * b + l - i];
+		//copy matrix A12 in A (works)
+		for (int j = i; j < b + i; j++)
+			for (int l = i + b; l < n; l++)
+				A[j * n + l] = A12_tmp[(l - (i + b)) * b + j - i];
+		//copy matrix A21 in A (works)
+		for (int j = i + b; j < n; j++)
+			for (int l = i; l < i + b; l++)
+				A[j * n + l] = A21_tmp[(j - (i + b)) * b + l - i];
+	}
+	clear_matrix(A11_tmp);
+	clear_matrix(A21_tmp);
+	clear_matrix(A12_tmp);
+}
+
 //solver (works)
 void	LU_solve(double* L, double* U, double* b, double*& x)
 {

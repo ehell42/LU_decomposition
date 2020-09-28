@@ -3,8 +3,8 @@
 #include <fstream>
 #include "omp.h"
 
-const int n = 1024;	//размерность матрицы
-const int b = 16;	//размерность блока
+const int n = 2048;	//размерность матрицы
+const int b = 4;	//размерность блока
 
 void	make_matrix(double* &A);
 void	init_matrix(double*& A);
@@ -18,4 +18,5 @@ void	LU_solve(double* L, double* U, double* b, double*& x);
 void	print_matrix(double* A);
 void	mult(double* &C, double *L, double *U);
 void	clear_matrix(double* &A);
-void	copy_part_matrix(double* A, double* &B, int d, int f);
+void	copy_part_matrix(double* A, double* &B, int d, int f, int m);
+void	LU_transpose_decomposition_blocks(double*& A);

@@ -44,3 +44,31 @@ void	init_zero(double*& A, int num)
 	for (int i = 0; i < num; i++)
 		A[i] = 0;
 }
+//works right
+void	copy_part_matrix(double* A, double*& B, int d, int f, int m)
+{
+	if (f == 0)
+	{
+		for (int i = d - m; i < d; i++)
+			for (int j = d; j < n; j++)
+				B[(i - (d - m)) * (n - d) + (j - d)] = A[i * n + j];
+	}
+	else if (f == 1)
+	{
+		for (int i = d; i < n; i++)
+			for (int j = d - m; j < d; j++)
+				B[(i - d) * m + (j - (d - m))] = A[i * n + j];
+	}
+	else if (f == 2)
+	{
+		for (int i = d; i < d + m; i++)
+			for (int j = d; j < d + m; j++)
+				B[(i - d) * m + (j - d)] = A[i * n + j];
+	}
+	else
+	{
+		for (int i = d - m; i < d; i++)
+			for (int j = d; j < n; j++)
+				B[(j - d) * m + i - (d - m)] = A[i * n + j];
+	}
+}
