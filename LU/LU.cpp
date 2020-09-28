@@ -115,32 +115,50 @@ void	LU_transpose_decomposition_blocks(double*& A)
 	for (int i = 0; i < n; i += b)
 	{
 		//find diagonal block (works)
-		copy_part_matrix(A, A11_tmp, i, 2, b);//right
+		for (int k = i; k < i + b; k++)
+			for (int l = i; l < i + b; l++)
+				A11_tmp[(k - i) * b + l - i] = A[k * n + l];
 		LU_decomposition(A11_tmp, b);//right
 		//copy side matrix
-		copy_part_matrix(A, A12_tmp, i + b, 3, b);//right
-		copy_part_matrix(A, A21_tmp, i + b, 1, b);//right
+		//for U
+		for (int k = i; k < i + b; k++)
+			for (int l = i + b; l < n; l++)
+				A12_tmp[(l - (i + b)) * b + k - i] = A[k * n + l];
+		//for L
+		for (int k = i + b; k < n; k++)
+			for (int l = i; l < i + b; l++)
+				A21_tmp[(k - (i + b)) * b + l - i] = A[k * n + l];
 		//find U_12 (works)
 		for (int j = 0; j < n - (i + b); j++)
 			for (int k = 1; k < b; k++)
+			{
+				double tmp = 0;
 				for (int l = 0; l < k; l++)
-					A12_tmp[j * b + k] -= A12_tmp[j * b + l] * A11_tmp[k * b + l];
+					tmp += A12_tmp[j * b + l] * A11_tmp[k * b + l];
+				A12_tmp[j * b + k] -= tmp;
+			}
 		//find L_21 (works)
 		for (int j = 0; j < n - (i + b); j++)
 		{
 			A21_tmp[j * b] /= A11_tmp[0];
 			for (int k = 1; k < b; k++)
 			{
+				double tmp = 0;
 				for (int l = 0; l < k; l++)
-					A21_tmp[j * b + k] -= A21_tmp[j * b + l] * A11_tmp[l * b + k];
+					tmp += A21_tmp[j * b + l] * A11_tmp[l * b + k];
+				A21_tmp[j * b + k] -= tmp;
 				A21_tmp[j * b + k] /= A11_tmp[k * b + k];
 			}
 		}
 		//change matrix A22 (works)
 		for (int j = i + b; j < n; j++)
 			for (int l = i + b; l < n; l++)
+			{
+				double tmp = 0;
 				for (int k = 0; k < b; k++)
-					A[j * n + l] -= A21_tmp[(j - (i + b)) * b + k] * A12_tmp[(l - (i + b)) * b + k];
+					tmp += A21_tmp[(j - (i + b)) * b + k] * A12_tmp[(l - (i + b)) * b + k];
+				A[j * n + l] -= tmp;
+			}
 		//copy matrix A11 in A (works)
 		for (int j = i; j < i + b; j++)
 			for (int l = i; l < i + b; l++)

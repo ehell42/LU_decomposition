@@ -14,7 +14,7 @@ int	main()
 	b = new double[n];
 	x = new double[n];
 
-	double t1, t2;
+	double t1, t2, tms0, tms1, tms2;
 
 	make_matrix(A);
 	make_matrix(A_copy);
@@ -46,7 +46,8 @@ int	main()
 	t1 = omp_get_wtime();
 	LU_decomposition(A);
 	t2 = omp_get_wtime();
-	std::cout << "Time LU-block = " << (double)(t2 - t1) << " sec" << std::endl;
+	tms0 = (double)(t2 - t1);
+	std::cout << "Time LU-block = " << tms0 << " sec" << std::endl;
 	std::cout << "A[n/2][n/2] = " << A[n / 2 * n + n / 2] << std::endl;
 //	print_matrix(A);
 
@@ -55,17 +56,22 @@ int	main()
 	t1 = omp_get_wtime();
 	LU_decomposition_blocks(A_copy);
 	t2 = omp_get_wtime();
-	std::cout << "Time LU-block = " << (double)(t2 - t1) << " sec" << std::endl;
+	tms1 = (double)(t2 - t1);
+	std::cout << "Time LU-block = " << tms1 << " sec" << std::endl;
 	std::cout << "A[n/2][n/2] = " << A_copy[n / 2 * n + n / 2] << std::endl;
 //	print_matrix(A_copy);
+
+	std::cout << "Times with usual U = " << tms0 / tms1 << std::endl;
 
 	//блочное LU разложение (транспонированная U)
 	std::cout << "\nLU-decomposition using blocks with U transpose\n";
 	t1 = omp_get_wtime();
 	LU_transpose_decomposition_blocks(A_copy2);
 	t2 = omp_get_wtime();
-	std::cout << "Time LU-block = " << (double)(t2 - t1) << " sec" << std::endl;
+	tms2 = (double)(t2 - t1);
+	std::cout << "Time LU-block = " << tms2 << " sec" << std::endl;
 	std::cout << "A[n/2][n/2] = " << A_copy2[n / 2 * n + n / 2] << std::endl;
+	std::cout << "Times with U transpose = " << tms0 / tms1 << std::endl;
 //		print_matrix(A_copy2);
 
 	//очистка памяти
