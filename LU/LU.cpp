@@ -120,14 +120,12 @@ void	LU_transpose_decomposition_blocks(double*& A)
 				A11_tmp[(k - i) * b + l - i] = A[k * n + l];
 		LU_decomposition(A11_tmp, b);//right
 		//copy side matrix
-		//for U
-		for (int k = i; k < i + b; k++)
-			for (int l = i + b; l < n; l++)
-				A12_tmp[(l - (i + b)) * b + k - i] = A[k * n + l];
-		//for L
-		for (int k = i + b; k < n; k++)
-			for (int l = i; l < i + b; l++)
-				A21_tmp[(k - (i + b)) * b + l - i] = A[k * n + l];
+		//for U & L
+		for (int l = i + b; l < n; l++)
+			for (int k = i; k < i + b; k++) {
+				A12_tmp[(l - (i + b)) * b + k - i] = A[k * n + l];//U
+				A21_tmp[(l - (i + b)) * b + k - i] = A[l * n + k];//L
+			}
 		//find U_12 (works)
 		for (int j = 0; j < n - (i + b); j++)
 			for (int k = 1; k < b; k++)

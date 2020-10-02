@@ -4,7 +4,7 @@
 #include "omp.h"
 
 const int n = 2048;	//размерность матрицы
-const int b = 8;	//размерность блока
+const int b = 16;	//размерность блока
 
 void	make_matrix(double* &A);
 void	init_matrix(double*& A);
