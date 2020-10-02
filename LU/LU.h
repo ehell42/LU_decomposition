@@ -20,3 +20,4 @@ void	mult(double* &C, double *L, double *U);
 void	clear_matrix(double* &A);
 void	copy_part_matrix(double* A, double* &B, int d, int f, int m);
 void	LU_transpose_decomposition_blocks(double*& A);
+void	LU_transpose_decomposition_blocks_parallel(double*& A);

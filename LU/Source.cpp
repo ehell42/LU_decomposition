@@ -26,6 +26,7 @@ int	main()
 	init_zero(U, n * n);
 	init_zero(C, n * n);
 	init_random_matrix(A);
+//	init_matrix(A);
 	copy_part_matrix(A, A_copy, 0, 2, n);
 	copy_part_matrix(A, A_copy2, 0, 2, n);
 	//алгоритм из вики
@@ -73,6 +74,16 @@ int	main()
 	std::cout << "A[n/2][n/2] = " << A_copy2[n / 2 * n + n / 2] << std::endl;
 	std::cout << "Times with U transpose = " << tms0 / tms2 << std::endl;
 //		print_matrix(A_copy2);
+		//блочное LU разложение (транспонированная U)
+	std::cout << "\nLU-decomposition (parallel) using blocks with U transpose\n";
+	t1 = omp_get_wtime();
+	LU_transpose_decomposition_blocks_parallel(A_copy);
+	t2 = omp_get_wtime();
+	tms1 = (double)(t2 - t1);
+	std::cout << "Time LU-block = " << tms1 << " sec" << std::endl;
+	std::cout << "A[n/2][n/2] = " << A_copy[n / 2 * n + n / 2] << std::endl;
+	std::cout << "Times with U transpose = " << tms0 / tms1 << std::endl;
+
 
 	//очистка памяти
 	clear_matrix(A);
