@@ -24,24 +24,26 @@ void	LU_decomposition(double*& A, double*& L, double*& U)
 //from Demmel (works)
 void	LU_decomposition(double*& A)
 {
+	double	tmp;
 	for (int i = 0; i < n - 1; i++)
 	{
-		for (int j = i + 1; j < n; j++)
+		for (int j = i + 1; j < n; j++) {
 			A[j * n + i] = A[j * n + i] / A[i * n + i];
-		for (int j = i + 1; j < n; j++)
+			tmp = A[j * n + i];
 			for (int k = i + 1; k < n; k++)
-				A[j * n + k] = A[j * n + k] - A[j * n + i] * A[i * n + k];
+				A[j * n + k] = A[j * n + k] - tmp * A[i * n + k];
+		}
 	}
 }
 void	LU_decomposition(double*& A, int m)
 {
 	for (int i = 0; i < m - 1; i++)
 	{
-		for (int j = i + 1; j < m; j++)
+		for (int j = i + 1; j < m; j++) {
 			A[j * m + i] = A[j * m + i] / A[i * m + i];
-		for (int j = i + 1; j < m; j++)
 			for (int k = i + 1; k < m; k++)
 				A[j * m + k] = A[j * m + k] - A[j * m + i] * A[i * m + k];
+		}
 	}
 }
 //blocks LU-decomposition from Demmel (works!)
@@ -118,7 +120,17 @@ void	LU_transpose_decomposition_blocks(double*& A)
 		for (int k = i; k < i + b; k++)
 			for (int l = i; l < i + b; l++)
 				A11_tmp[(k - i) * b + l - i] = A[k * n + l];
-		LU_decomposition(A11_tmp, b);//right
+		//	LU decomposition A11 (works)
+		double temp;
+		for (int l = 0; l < b - 1; l++)
+		{
+			for (int j = l + 1; j < b; j++) {
+				temp = A11_tmp[j * b + l] / A11_tmp[l * b + l];
+				A11_tmp[j * b + l] = temp;
+				for (int k = l + 1; k < b; k++)
+					A11_tmp[j * b + k] = A11_tmp[j * b + k] - temp * A11_tmp[l * b + k];			
+			}
+		}
 		//copy side matrix
 		//for U & L
 		for (int l = i + b; l < n; l++)
@@ -185,26 +197,34 @@ void	LU_transpose_decomposition_blocks_parallel(double*& A)
 	init_zero(A21_tmp, (n - b) * b);
 	init_zero(A11_tmp, b * b);
 
+	omp_set_num_threads(4);
+
 	for (int i = 0; i < n; i += b)
 	{
 		//find diagonal block (works)
-#pragma omp parallel //default(none) shared(nth) firstprivate(th)// reduction(+:sum)
-		{
 			for (int k = i; k < i + b; k++)
 				for (int l = i; l < i + b; l++)
 					A11_tmp[(k - i) * b + l - i] = A[k * n + l];
-		}
-		LU_decomposition(A11_tmp, b);//right
+	//	LU decomposition A11 (works)
+			double temp;
+//#pragma omp parallel for
+			for (int l = 0; l < b - 1; l++)
+			{
+				for (int j = l + 1; j < b; j++) {
+					temp = A11_tmp[j * b + l] / A11_tmp[l * b + l];
+					A11_tmp[j * b + l] = temp;
+					for (int k = l + 1; k < b; k++)
+						A11_tmp[j * b + k] = A11_tmp[j * b + k] - temp * A11_tmp[l * b + k];
+				}
+			}
 		//copy side matrix
 		//for U & L
-#pragma omp parallel //default(none) shared(nth) firstprivate(th)// reduction(+:sum)
-		{
+#pragma omp parallel for
 			for (int l = i + b; l < n; l++)
 				for (int k = i; k < i + b; k++) {
 					A12_tmp[(l - (i + b)) * b + k - i] = A[k * n + l];//U
 					A21_tmp[(l - (i + b)) * b + k - i] = A[l * n + k];//L
 				}
-		}
 		//find U_12 (works)
 		for (int j = 0; j < n - (i + b); j++)
 			for (int k = 1; k < b; k++)
@@ -228,9 +248,8 @@ void	LU_transpose_decomposition_blocks_parallel(double*& A)
 			}
 		}
 			//change matrix A22 (works)
+#pragma omp parallel for  //if (((n - i - b) * (n - i - b) * b) > 5000) 
 			for (int j = i + b; j < n; j++)
-#pragma omp parallel //default(none) shared(nth) firstprivate(th)// reduction(+:sum)
-		{
 				for (int l = i + b; l < n; l++)
 				{
 					double tmp = 0;
@@ -238,28 +257,22 @@ void	LU_transpose_decomposition_blocks_parallel(double*& A)
 						tmp += A21_tmp[(j - (i + b)) * b + k] * A12_tmp[(l - (i + b)) * b + k];
 					A[j * n + l] -= tmp;
 				}
-		}
-		//copy matrix A11 in A (works)
-#pragma omp parallel //default(none) shared(nth) firstprivate(th)// reduction(+:sum)
-			{
-				for (int j = i; j < i + b; j++)
+		//copy matrix A11 in A (works) 
+#pragma omp parallel for
+		for (int j = i; j < i + b; j++)
 					for (int l = i; l < i + b; l++)
 						A[j * n + l] = A11_tmp[(j - i) * b + l - i];
-			}
 		//copy matrix A12 in A (works)
-#pragma omp parallel //default(none) shared(nth) firstprivate(th)// reduction(+:sum)
-			{
+#pragma omp parallel for
 				for (int j = i; j < b + i; j++)
 					for (int l = i + b; l < n; l++)
 						A[j * n + l] = A12_tmp[(l - (i + b)) * b + j - i];
-			}
 		//copy matrix A21 in A (works)
-#pragma omp parallel //default(none) shared(nth) firstprivate(th)// reduction(+:sum)
-			{
+
+#pragma omp parallel
 				for (int j = i + b; j < n; j++)
 					for (int l = i; l < i + b; l++)
 						A[j * n + l] = A21_tmp[(j - (i + b)) * b + l - i];
-			}
 	}
 	clear_matrix(A11_tmp);
 	clear_matrix(A21_tmp);

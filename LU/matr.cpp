@@ -12,7 +12,7 @@ void	init_matrix(double*& A)
 {
 	std::ifstream file;
 
-	file.open("rand_matr2048.txt");
+	file.open("rand_matr1024.txt");
 	for (int i = 0; i < n; i++)
 		for (int j = 0; j < n; j++)
 			file >> A[i * n + j];

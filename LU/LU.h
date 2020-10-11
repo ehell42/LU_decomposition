@@ -3,8 +3,8 @@
 #include <fstream>
 #include "omp.h"
 
-const int n = 2048;	//размерность матрицы
-const int b = 16;	//размерность блока
+const int n = 1024;	//размерность матрицы
+const int b = 64;	//размерность блока
 
 void	make_matrix(double* &A);
 void	init_matrix(double*& A);

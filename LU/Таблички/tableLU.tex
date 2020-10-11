@@ -1,0 +1,106 @@
+\documentclass[12pt,a4paper]{article}
+
+%\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+
+\usepackage{hyperref}
+
+\usepackage{pdfpages}
+\begin{document}
+Intel compiler матрица 2048.
+
+\begin{center}
+%\caption{Intel compiler матрица 2048}
+\begin{table}
+\begin{tabular}{|c|c|c||c||c|c|}
+\hline
+	 & Блок 4 & Блок 8 & Блок 16 & Блок 32 & Блок 64\\
+\hline
+\hline
+Последовательный код & 2.74131 & 2.74728 & 2.7289 & 2.74837 & 2.79343 \\
+\hline
+\hline
+Блочный последовательный & 1.62355 & 1.62085 & 1.18234 & 1.55001 & 1.22578 \\
+\hline
+Блочный параллельный & 0.76288 & 0.648918 & 0.585503 & 0.773511 & 0.62429\\
+\hline
+Ускорение для блочного & 2.11871 & 2.49777 & 2.01936 & 2.00387 & 1.96347\\
+\hline
+\end{tabular}
+\end{table}
+\end{center}
+
+
+Intel compiler матрица 1024.
+
+\begin{center}
+%\caption{Intel compiler матрица 2048}
+\begin{table}
+\begin{tabular}{|c|c|c||c||c|c|}
+\hline
+	 & Блок 4 & Блок 8 & Блок 16 & Блок 32 & Блок 64\\
+\hline
+\hline
+Последовательный код & 0.511608 & 0.568279 & 0.518505 & 0.447054 & 0.531548 \\
+\hline
+\hline
+Блочный последовательный & 0.283308 & 0.24775 & 0.161777 & 0.199382 & 0.212585 \\
+\hline
+Блочный параллельный & 0.103524 & 0.0900785 & 0.0818589 & 0.113741 & 0.115502\\
+\hline
+Ускорение для блочного & 2.73664 & 2.75035 & 1.97629 & 1.75294 & 1.24054\\
+\hline
+\end{tabular}
+\end{table}
+\end{center}
+
+
+VisualC compiler матрица 2048.
+
+\begin{center}
+%\caption{Intel compiler матрица 2048}
+\begin{table}
+\begin{tabular}{|c|c|c|c||c||c|}
+\hline
+	 & Блок 4 & Блок 8 & Блок 16 & Блок 32 & Блок 64\\
+\hline
+\hline
+Последовательный код & 3.62171 & 3.60391 & 3.61384 & 3.57914 & 3.61283 \\
+\hline
+\hline
+Блочный последовательный & 7.33141 & 6.74391 & 6.35053 & 5.80425 & 5.63604 \\
+\hline
+Блочный параллельный & 2.17265 & 1.99505 & 1.79723 & 1.77398 & 1.84502\\
+\hline
+Ускорение для блочного & 3.37441 & 3.38032 & 3.5335 & 3.27189 & 3.05341\\
+\hline
+\end{tabular}
+\end{table}
+\end{center}
+
+VisualC compiler матрица 1024.
+
+\begin{center}
+%\caption{Intel compiler матрица 2048}
+\begin{table}
+\begin{tabular}{|c|c|c|c||c||c|}
+\hline
+	 & Блок 4 & Блок 8 & Блок 16 & Блок 32 & Блок 64\\
+\hline
+\hline
+Последовательный код & 0.609625 & 0.624226 & 0.753833 & 0.612674 & 0.593805 \\
+\hline
+\hline
+Блочный последовательный & 0.930193 & 0.862841 & 0.819498 & 0.737005 & 0.717599 \\
+\hline
+Блочный параллельный & 0.288938 & 0.269834 & 0.251608 & 0.243032 & 0.270034\\
+\hline
+Ускорение для блочного & 3.21936 & 3.19768 & 3.25704 & 3.03254 & 2.65744\\
+\hline
+\end{tabular}
+\end{table}
+\end{center}
+
+
+\end{document}

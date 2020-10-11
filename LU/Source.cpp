@@ -25,8 +25,8 @@ int	main()
 	init_zero(L, n * n);
 	init_zero(U, n * n);
 	init_zero(C, n * n);
-	init_random_matrix(A);
-//	init_matrix(A);
+//	init_random_matrix(A);
+	init_matrix(A);
 	copy_part_matrix(A, A_copy, 0, 2, n);
 	copy_part_matrix(A, A_copy2, 0, 2, n);
 	//алгоритм из вики
@@ -50,6 +50,7 @@ int	main()
 	tms0 = (double)(t2 - t1);
 	std::cout << "Time LU-block = " << tms0 << " sec" << std::endl;
 	std::cout << "A[n/2][n/2] = " << A[n / 2 * n + n / 2] << std::endl;
+	std::cout << "=======================================================\n";
 //	print_matrix(A);
 
 	//блочное LU разложение
@@ -73,6 +74,7 @@ int	main()
 	std::cout << "Time LU-block = " << tms2 << " sec" << std::endl;
 	std::cout << "A[n/2][n/2] = " << A_copy2[n / 2 * n + n / 2] << std::endl;
 	std::cout << "Times with U transpose = " << tms0 / tms2 << std::endl;
+	std::cout << "=======================================================\n";
 //		print_matrix(A_copy2);
 		//блочное LU разложение (транспонированная U)
 	std::cout << "\nLU-decomposition (parallel) using blocks with U transpose\n";
@@ -82,8 +84,8 @@ int	main()
 	tms1 = (double)(t2 - t1);
 	std::cout << "Time LU-block = " << tms1 << " sec" << std::endl;
 	std::cout << "A[n/2][n/2] = " << A_copy[n / 2 * n + n / 2] << std::endl;
-	std::cout << "Times with U transpose = " << tms0 / tms1 << std::endl;
-
+//	std::cout << "Times with U transpose = " << tms0 / tms1 << std::endl;
+	std::cout << "Times parallel = " << tms2 / tms1 << std::endl;
 
 	//очистка памяти
 	clear_matrix(A);
